@@ -26,7 +26,7 @@ func (c *RestoreCommand) Run(ctx context.Context, args []string) (err error) {
 	fs.Var((*txidVar)(&opt.TXID), "txid", "transaction ID")
 	fs.IntVar(&opt.Parallelism, "parallelism", opt.Parallelism, "parallelism")
 	ifDBNotExists := fs.Bool("if-db-not-exists", false, "")
-	ifReplicaExists := fs.Bool("if-replica-exists", false, "")
+	// ifReplicaExists := fs.Bool("if-replica-exists", false, "")
 	timestampStr := fs.String("timestamp", "", "timestamp")
 	fs.Usage = c.Usage
 	if err := fs.Parse(args); err != nil {
@@ -68,16 +68,18 @@ func (c *RestoreCommand) Run(ctx context.Context, args []string) (err error) {
 		}
 	}
 
-	if err := r.Restore(ctx, opt); errors.Is(err, litestream.ErrTxNotAvailable) {
+	/*
+		// TODO(ltx): Fix -if-replica-exists flag
+
+		// Return an error if no matching targets found.
+		// If optional flag set, return success. Useful for automated recovery.
 		if *ifReplicaExists {
 			slog.Info("no matching backups found")
 			return nil
 		}
-		return fmt.Errorf("no matching backup files available")
-	} else if err != nil {
-		return err
-	}
-	return nil
+	*/
+
+	return r.Restore(ctx, opt)
 }
 
 // loadFromURL creates a replica & updates the restore options from a replica URL.
